@@ -15,8 +15,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeInput = document.getElementById('placeInput');
     const placeList = document.getElementById('placeList');
     const comboboxToggle = document.getElementById('comboboxToggle');
+    const countBtn = document.getElementById('countBtn');
+    const headCountResult = document.getElementById('headCountResult');
 
     let stream = null;
+    let lastHeadCount = null;
+
+    // Count button behavior (show latest head count)
+    countBtn.addEventListener('click', () => {
+        if (lastHeadCount === null) {
+            ipsAlert('Please upload an image first then retry.', 'info');
+            return;
+        }
+        headCountResult.textContent = 'Head count: ' + lastHeadCount;
+        ipsAlert('Detected head count: ' + lastHeadCount, 'success');
+    });
 
     // Combobox functionality
     if (placeInput && placeList && comboboxToggle) {
@@ -278,6 +291,11 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
 
             if (data.success) {
+                // Save head count for manual display via Count button
+                lastHeadCount = data.head_count;
+                countBtn.disabled = false;
+                headCountResult.textContent = 'Head count: ' + lastHeadCount;
+
                 // Show success toast
                 successMessage.style.display = 'flex';
                 resetForm();

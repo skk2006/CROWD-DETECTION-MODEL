@@ -136,18 +136,21 @@ def upload():
             pass
 
     # Upload annotated image to Cloudinary (permanent cloud storage)
+    annotated_url = None
+    cloudinary_public_id = None
+    cloud_upload_error = None
     try:
         result = cloudinary.uploader.upload(
             annotated_bytes,
             folder="crowd_detection",
             resource_type="image"
         )
-        annotated_url = result["secure_url"]
-        cloudinary_public_id = result["public_id"]
+        annotated_url = result.get("secure_url")
+        cloudinary_public_id = result.get("public_id")
     except Exception as e:
-        return jsonify({"success": False, "error": f"Cloud upload failed: {str(e)}"}), 500
+        cloud_upload_error = str(e)
 
-    # Save record to MongoDB
+    # Save record to MongoDB (or local file) regardless of cloud upload status
     records = db.load_records()
     new_id = max((r["id"] for r in records), default=0) + 1
     records.append({
@@ -156,11 +159,16 @@ def upload():
         "annotated_url": annotated_url,
         "cloudinary_public_id": cloudinary_public_id,
         "head_count": head_count,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "cloud_upload_error": cloud_upload_error,
     })
     db.save_records(records)
 
-    return jsonify({"success": True, "head_count": head_count, "event": event})
+    resp = {"success": True, "head_count": head_count, "event": event}
+    if cloud_upload_error:
+        resp["warning"] = "Cloud upload failed: " + cloud_upload_error
+    return jsonify(resp)
+
 
 
 
