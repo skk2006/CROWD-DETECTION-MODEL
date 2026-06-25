@@ -23,7 +23,7 @@ A Flask web application that counts people in images using a remote detection AP
 
 ## Architecture Overview
 
-IPS Tech Community uses a **two-service architecture**:
+Community uses a **two-service architecture**:
 
 ```
 ┌─────────────────────────┐         ┌──────────────────────────────────┐
