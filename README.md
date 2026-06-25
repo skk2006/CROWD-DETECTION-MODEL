@@ -1,4 +1,4 @@
-# IPS Tech Community — Crowd Detection System
+#Crowd Detection System
 
 A Flask web application that counts people in images using a remote detection API deployed on Hugging Face Spaces. The Flask app sends images to the model API, which runs YOLOv8 + YuNet detection and returns annotated images with head counts. Annotated images are stored permanently on Cloudinary, and all records are persisted in MongoDB Atlas — surviving across deployments.
 
